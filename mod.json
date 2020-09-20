@@ -1,0 +1,9 @@
+{
+	"name": "ldb",
+	"displayName": "[purple]Logic [gray]Debugger",
+	"author": "DeltaNedas",
+	"description": "Adds a clientside memory cell debugging tool.",
+	"hidden": true,
+	"version": "1.0.0",
+	"minGameVersion": 105
+}
