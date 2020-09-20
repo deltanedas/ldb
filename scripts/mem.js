@@ -10,7 +10,7 @@ const override = block => {
 					const index = i;
 					const value = () => "" + this.memory[index];
 
-					pane.add("#" + i).get().alignment = Align.left;
+					pane.add("#" + i).left().get().alignment = Align.left;
 					pane.label(value).growX().get().alignment = Align.right;
 					pane.row();
 				}
