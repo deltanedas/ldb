@@ -23,7 +23,6 @@ Events.on(ClientLoadEvent, () => {
 	const blocks = Vars.content.blocks().items;
 	for (var block of blocks) {
 		if (block instanceof MemoryBlock) {
-			print("hh" + block)
 			override(block);
 		}
 	}
