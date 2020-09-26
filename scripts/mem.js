@@ -1,4 +1,3 @@
-// TODO: iterate Vars.content.blocks() when client loads for modded cell support
 const override = block => {
 	const build = block.newBuilding().class;
 	block.configurable = true;
