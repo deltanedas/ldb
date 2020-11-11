@@ -1,4 +1,4 @@
-const override = block => {
+module.exports = block => {
 	const build = block.newBuilding().class;
 	block.configurable = true;
 	block.buildType = () => extendContent(build, block, {
@@ -17,12 +17,3 @@ const override = block => {
 		}
 	});
 };
-
-Events.on(ClientLoadEvent, () => {
-	const blocks = Vars.content.blocks().items;
-	for (var block of blocks) {
-		if (block instanceof MemoryBlock) {
-			override(block);
-		}
-	}
-});
