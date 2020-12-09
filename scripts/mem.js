@@ -1,7 +1,7 @@
 module.exports = block => {
 	const build = block.newBuilding().class;
 	block.configurable = true;
-	block.buildType = () => extendContent(build, block, {
+	block.buildType = () => extend(build, block, {
 		buildConfiguration(table) {
 			table.background(Styles.black6);
 			table.pane(pane => {

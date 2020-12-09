@@ -1,6 +1,6 @@
 module.exports = block => {
 	const build = block.newBuilding().class;
-	block.buildType = () => extendContent(build, block, {
+	block.buildType = () => extend(build, block, {
 		buildConfiguration(table) {
 			this.super$buildConfiguration(table);
 			// Remove long black bar due to collapser
