@@ -11,7 +11,7 @@ global.override.block(LogicBlock, {
 
 		this.ldbBuildVariables();
 		table.row();
-		table.add(this.table).size(300, 200).bottom().colspan(2);
+		table.add(this.table).size(300, 300).bottom().colspan(2);
 	},
 
 	ldbBuildVariables() {
