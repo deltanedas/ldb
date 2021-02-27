@@ -16,13 +16,14 @@ global.override.block(LogicBlock, {
 
 	ldbBuildVariables() {
 		this.table = new Collapser(table => {
-			table.pane(pane => {
-				pane.background(Styles.black6);
+			table.pane(tableInPane => {
+				tableInPane.left();
+				tableInPane.background(Styles.black6);
 				for (var v of this.executor.vars) {
 					// Only show the constant @unit
 					if (!v.constant || v.name == "@unit") {
-						pane.label(this.ldbVarVal(v)).padLeft(10).left().get().alignment = Align.left;
-						pane.row();
+						tableInPane.label(this.ldbVarVal(v)).padLeft(10).left().get().alignment = Align.left;
+						tableInPane.row();
 					}
 				}
 			}).grow().left().margin(10).pad(10);
