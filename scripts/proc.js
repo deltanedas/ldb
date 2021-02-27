@@ -5,19 +5,22 @@ global.override.block(LogicBlock, {
 		table.background(null);
 		table.cells.get(0).right();
 		const button = table.button(Icon.upOpen, Styles.clearTransi, () => {
-			this.table.toggle();
-			button.style.imageUp = this.table.collapsed ? Icon.upOpen : Icon.downOpen;
+			this.collapser.toggle();
+			button.style.imageUp = this.collapser.collapsed ? Icon.upOpen : Icon.downOpen;
 		}).size(40).left().get();
 
 		this.ldbBuildVariables();
 		table.row();
-		table.add(this.table).size(300, 300).bottom().colspan(2);
+		table.add(this.collapser).size(300, 300).bottom().colspan(2);
 	},
 
 	ldbBuildVariables() {
-		this.table = new Collapser(table => {
+		this.collapser = new Collapser(table => {
+			let back = new BaseDrawable(Styles.none);
+			back.minHeight = 300;
+			table.background(back);
 			table.pane(tableInPane => {
-				tableInPane.left();
+				tableInPane.left().top().margin(10);
 				tableInPane.background(Styles.black6);
 				for (var v of this.executor.vars) {
 					// Only show the constant @unit
