@@ -36,7 +36,7 @@ global.override.block(LogicBlock, {
 			let back = new BaseDrawable(Styles.none);
 			back.minHeight = 600;
 			table.background(back);
-			table.pane(tableInPane => {
+			let p = table.pane(tableInPane => {
 				tableInPane.left().top().margin(10);
 				tableInPane.background(Styles.black6);
 				for (var v of this.executor.vars) {
@@ -46,7 +46,9 @@ global.override.block(LogicBlock, {
 						tableInPane.row();
 					}
 				}
-			}).grow().left().margin(10).pad(10).get().setOverscroll(false, false);
+			}).grow().left().margin(10).pad(10).get();
+			p.setOverscroll(false, false);
+			p.setSmoothScrolling(false);
 		}, true);
 	},
 

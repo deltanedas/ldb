@@ -51,6 +51,7 @@ require("override-lib/library").block(MemoryBlock, {
 			.size(Math.max(minWidth, colMul * this.ldbSlideVal), height)
 			.pad(10).colspan(3);
 		paneCell.get().setOverscroll(false, false);
+		paneCell.get().setSmoothScrolling(false);
 	},
 
 	ldbSetTable(table) {
