@@ -3,7 +3,7 @@ global.override.block(LogicBlock, {
 		this.super$buildConfiguration(table);
 		// Remove long black bar due to collapser
 		table.background(null);
-		
+
 		let editBtn = table.cells.get(0).get();
 		table.clearChildren();
 
@@ -15,15 +15,19 @@ global.override.block(LogicBlock, {
 				button.style.imageUp = this.ldbCollapser.collapsed ? Icon.downOpen : Icon.upOpen;
 			}).size(40).center().tooltip("vars").get();
 
-			table.button(Icon.rotate, Styles.clearTransi, () => this.executor.vars[0].numval = 0)
-				.size(40).center().tooltip("restart");
+			global.ldbTipNo("restart",
+				table.button(Icon.rotate, Styles.clearTransi, () => this.executor.vars[0].numval = 0)
+					.size(40).center()
+			);
 
-			table.button(Icon.trash, Styles.clearTransi, () => {
-				this.updateCode(this.code);
-				let collapsed = this.ldbCollapser.isCollapsed();
-				this.ldbBuildVariables();
-				cell.setElement(this.ldbCollapser).get().setCollapsed(collapsed);
-			}).size(40).center().tooltip("reset");
+			global.ldbTipNo("reset",
+				table.button(Icon.trash, Styles.clearTransi, () => {
+					this.updateCode(this.code);
+					let collapsed = this.ldbCollapser.isCollapsed();
+					this.ldbBuildVariables();
+					cell.setElement(this.ldbCollapser).get().setCollapsed(collapsed);
+				}).size(40).center()
+			);
 		}).center();
 		table.row();
 

@@ -41,7 +41,7 @@ global.override.block(LogicDisplay, {
 					cf.setText(padCf(val));
 				}
 				that.ldbSetC.pop();
-				
+
 				that.ldbSetO.push(true);
 				setO(that.ldbR, "R", NaN, that);
 				setO(that.ldbG, "G", NaN, that);
@@ -70,13 +70,15 @@ global.override.block(LogicDisplay, {
 					that.ldbSetC.pop();
 				}
 			}
-		}		
-		
+		}
+
 		table.background(Styles.black6);
 
-		table.button(Icon.eraser, Styles.clearTransi, () => {
-			this.commands.addLast(DisplayCmd.get(0, this.ldbR, this.ldbG, this.ldbB, 0, 0, 0));
-		}).size(40).pad(10);
+		global.ldbTipNo("clear screen",
+			table.button(Icon.eraser, Styles.clearTransi, () => {
+				this.commands.addLast(DisplayCmd.get(0, this.ldbR, this.ldbG, this.ldbB, 0, 0, 0));
+			}).size(40).pad(10)
+		);
 
 		const cs = table.slider(0, 0xFFFFFF, 1, this.ldbC, v => setC(v, false, this)).padRight(10).get();
 		const cf = table.field(padCf(this.ldbC), v => setC(parseInt(v, 16), true, this)).padRight(10).get();

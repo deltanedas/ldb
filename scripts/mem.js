@@ -27,11 +27,13 @@ require("override-lib/library").block(MemoryBlock, {
 
 		table.background(Styles.black6);
 
-		table.check("", v => {
+		let c = table.check("", v => {
 			this.ldbEditMem = v; 
 			setWidth(this);
 			updatePane(this); 
-		}).size(40).right().pad(10).tooltip("edit").get().setChecked(this.ldbEditMem);
+		}).size(40).right().pad(10);
+		c.get().setChecked(this.ldbEditMem);
+		global.ldbTipNo("edit", c);
 
 		table.table(null, table => {
 			table.slider(1, 32, 1, this.ldbSlideVal, true, v => {
