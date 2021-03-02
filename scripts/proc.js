@@ -3,29 +3,56 @@ global.override.block(LogicBlock, {
 		this.super$buildConfiguration(table);
 		// Remove long black bar due to collapser
 		table.background(null);
-		table.cells.get(0).right();
-		const button = table.button(Icon.upOpen, Styles.clearTransi, () => {
-			this.table.toggle();
-			button.style.imageUp = this.table.collapsed ? Icon.upOpen : Icon.downOpen;
-		}).size(40).left().get();
+
+		let editBtn = table.cells.get(0).get();
+		table.clearChildren();
+
+		table.table(null, table => {
+			table.add(editBtn).size(40);
+
+			const button = table.button(Icon.downOpen, Styles.clearTransi, () => {
+				this.ldbCollapser.toggle();
+				button.style.imageUp = this.ldbCollapser.collapsed ? Icon.downOpen : Icon.upOpen;
+			}).size(40).center().tooltip("vars").get();
+
+			global.ldbTipNo("restart",
+				table.button(Icon.rotate, Styles.clearTransi, () => this.executor.vars[0].numval = 0)
+					.size(40).center()
+			);
+
+			global.ldbTipNo("reset",
+				table.button(Icon.trash, Styles.clearTransi, () => {
+					this.updateCode(this.code);
+					let collapsed = this.ldbCollapser.isCollapsed();
+					this.ldbBuildVariables();
+					cell.setElement(this.ldbCollapser).get().setCollapsed(collapsed);
+				}).size(40).center()
+			);
+		}).center();
+		table.row();
 
 		this.ldbBuildVariables();
-		table.row();
-		table.add(this.table).size(300, 300).bottom().colspan(2);
+		const cell = table.add(this.ldbCollapser).size(300, 600).bottom();
 	},
 
 	ldbBuildVariables() {
-		this.table = new Collapser(table => {
-			table.pane(pane => {
-				pane.background(Styles.black6);
+		this.ldbCollapser = new Collapser(table => {
+			let back = new BaseDrawable(Styles.none);
+			back.minHeight = 600;
+			table.background(back);
+			let p = table.pane(tableInPane => {
+				tableInPane.left().top().margin(10);
+				tableInPane.background(Styles.black6);
 				for (var v of this.executor.vars) {
 					// Only show the constant @unit
 					if (!v.constant || v.name == "@unit") {
-						pane.label(this.ldbVarVal(v)).padLeft(10).left().get().alignment = Align.left;
-						pane.row();
+						tableInPane.label(this.ldbVarVal(v)).padLeft(10).left().get().alignment = Align.left;
+						tableInPane.row();
 					}
 				}
-			}).grow().left().margin(10).pad(10);
+			}).grow().left().margin(10).pad(10).get();
+			p.setOverscroll(false, false);
+			p.setSmoothScrolling(false);
 		}, true);
 	},
 
@@ -40,5 +67,5 @@ global.override.block(LogicBlock, {
 		return v.name + ": " + v.numval;
 	},
 
-	ldbTable: null
+	ldbCollapser: null
 });
