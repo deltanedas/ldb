@@ -6,6 +6,12 @@ require("override-lib/library").block(MemoryBlock, {
 	ldbMinWidth : 0,
 	ldbColMul : 0,
 
+	ldbShowCell(index) {
+		return (this.ldbRangeArr.indexOf(index) != -1) ||
+			(this.ldbFilterIn === null ? false : this.ldbFilterIn(parseInt(index), this.memory[index]));
+	},
+	ldbFilterIn : null,
+
 	buildConfiguration(table) {
 		const updatePane = function(that) {
 			paneCell.get().setWidget(that.ldbSetTable(paneCell.get().getWidget()));
@@ -49,7 +55,10 @@ require("override-lib/library").block(MemoryBlock, {
 			this.ldbRangeStr = v;
 			this.ldbParseRange(v);
 			updatePane(this);
-		}).width(minWidth).pad(10).left().tooltip("ranges");
+		}).width(minWidth).pad(10).left()
+			.tooltip("ranges: start-end-step\n\n" +
+				"filters: JS function(index, value)\n" +
+				"only ref via arg[[]. reason unknown");
 		if (this.ldbSlideVal <= 3) { f.colspan(2); }
 		table.row();
 
@@ -65,7 +74,7 @@ require("override-lib/library").block(MemoryBlock, {
 		table.top();
 		let cnt = 0;
 		for (var i in this.memory) {
-			if (this.ldbRangeArr.indexOf(i) == -1) { continue; }
+			if (!this.ldbShowCell(i)) { continue; }
 
 			const index = i;
 			const value = () => "" + this.memory[index];
@@ -96,10 +105,25 @@ require("override-lib/library").block(MemoryBlock, {
 	},
 
 	ldbParseRange(str) {
-		const range = function(start, cnt) {
-			return Array.apply(0, Array(cnt)).map((_, i) => "" + (start + i));
+		const range = function(start, cnt, step) {
+			if (isNaN(step) || step === undefined || step === null) { step = 1; }
+			return Array.apply(0, Array(Math.floor(cnt / step))).map((_, i) => "" + (start + i * step));
 		};
 		this.ldbRangeArr = [];
+		if (str.indexOf("function") != -1 || (str.indexOf("=>") != -1)) {
+			try {
+				eval("this.ldbFilterIn = " + str);
+				this.ldbFilterIn(NaN, NaN);
+				this.ldbFilterIn(null, null);
+				this.ldbFilterIn(undefined, undefined);
+				for (var i = 0; i < 512; i++) {
+					this.ldbFilterIn(i, i);
+				}
+				return;
+			} catch(e) {
+				this.ldbFilterIn = null;
+			}
+		}
 		str.split(",").forEach(e => {
 			let split = e.split("-");
 			if (split.length == 1) {
@@ -108,9 +132,10 @@ require("override-lib/library").block(MemoryBlock, {
 					this.ldbRangeArr.push("" + s);
 				}
 			} else
-			if (split.length == 2) {
+			if (split.length >= 2) {
 				let s = parseInt(split[0]);
 				let e = parseInt(split[1]);
+				let c = parseInt(split[2]);
 				if (!isNaN(s)) {
 					if(isNaN(e)) {
 						e = 511;
@@ -120,7 +145,7 @@ require("override-lib/library").block(MemoryBlock, {
 						e = s;
 						s = t;
 					}
-					this.ldbRangeArr = this.ldbRangeArr.concat(range(s, e - s + 1));
+					this.ldbRangeArr = this.ldbRangeArr.concat(range(s, e - s + 1, c));
 				}
 			}
 		});
