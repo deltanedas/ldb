@@ -3,48 +3,52 @@ require("override-lib/library").block(MemoryBlock, {
 	ldbRangeStr : "0-511",
 	ldbRangeArr : [],
 	ldbEditMem: false,
+	ldbMinWidth : 0,
+	ldbColMul : 0,
 
 	buildConfiguration(table) {
-		table.background(Styles.black6);
-
-		const height = 500;
-		let minWidth = 300;
-		let colMul = 100;
-		if (this.ldbEditMem) {
-			minWidth = 400;
-			colMul = 140;
+		const updatePane = function(that) {
+			paneCell.get().setWidget(that.ldbSetTable(paneCell.get().getWidget()));
 		}
-
+		const setWidth = function(that) {
+			if (that.ldbEditMem) {
+				that.ldbMinWidth = 400;
+				that.ldbColMul = 200;
+			} else {
+				that.ldbMinWidth = 400;
+				that.ldbColMul = 200;
+			}
+		}
+		const height = 500;
+		setWidth(this);
+		let colMul = this.ldbColMul;
+		let minWidth = this.ldbMinWidth;
 		this.ldbParseRange(this.ldbRangeStr);
 
-		const updatePane = function(thiss) {
-			paneCell.get().setWidget(thiss.ldbSetTable(paneCell.get().getWidget()));
-		}
+		table.background(Styles.black6);
+
 		table.check("", v => {
 			this.ldbEditMem = v; 
-			if (v) {
-				minWidth = 400; colMul = 140;
-			} else {
-			 	minWidth = 300; colMul = 100;
-			}
+			setWidth(this);
 			updatePane(this); 
-		}).size(40).left().pad(10).tooltip("edit").get().setChecked(this.ldbEditMem);
-		table.pane(tableInPane => {
-			tableInPane.slider(1, 32, 1, this.ldbSlideVal, true, v => {
+		}).size(40).right().pad(10).tooltip("edit").get().setChecked(this.ldbEditMem);
+
+		table.table(null, table => {
+			table.slider(1, 32, 1, this.ldbSlideVal, true, v => {
 				this.ldbSlideVal = v;
 				updatePane(this);
-				paneCell.size(Math.max(minWidth, colMul * this.ldbSlideVal), height);
+				paneCell.size(Math.max(this.ldbMinWidth, colMul * this.ldbSlideVal), height);
 			}).left().width(minWidth - 50).get().moved(v => this.ldbSlideVal = v);
-			tableInPane.label(() => "" + this.ldbSlideVal).right().pad(10).get().alignment = Align.right;
+			table.label(() => "" + this.ldbSlideVal).right().pad(10).get().alignment = Align.right;
 		}).width(minWidth).pad(10).right().tooltip("columns");
-		if (this.ldbSlideVal <= 4) { table.row(); }
+		if (this.ldbSlideVal <= 3) { table.row(); }
 
 		let f = table.field(this.ldbRangeStr, v => {
 			this.ldbRangeStr = v;
 			this.ldbParseRange(v);
 			updatePane(this);
 		}).width(minWidth).pad(10).left().tooltip("ranges");
-		if (this.ldbSlideVal <= 4) { f.colspan(2); }
+		if (this.ldbSlideVal <= 3) { f.colspan(2); }
 		table.row();
 
 		const paneCell = table.pane(tableInPane => this.ldbSetTable(tableInPane))
@@ -65,16 +69,23 @@ require("override-lib/library").block(MemoryBlock, {
 			const value = () => "" + this.memory[index];
 
 			if (cnt % this.ldbSlideVal) {
-				table.add(" [gray]|[]  ");
+				table.add(" [gray]|[] ");
 			} else {
 				table.row();
 			}
 
-			table.add("[accent]#" + i).left().get().alignment = Align.left;
+			table.add("[accent]#" + i).left().width(60).get().alignment = Align.left;
 			if (this.ldbEditMem) {
-				table.field(value(), v => this.memory[index] = parseInt(v)).left().width(60);
+				const cell = table.field(value(), v => {
+					let listens = cell.get().getListeners();
+					listens.remove(listens.size - 1);
+					this.memory[index] = parseInt(v);
+					cell.tooltip((v => v + ", " + v.length)("" + this.memory[index]));
+				}).width(this.ldbColMul - 80).right()
+					.tooltip((v => v + ", " + v.length)("" + this.memory[i]));
 			} else {
-				table.label(value).right().get().alignment = Align.right;
+				table.label(value).width(this.ldbColMul - 80).maxSize(Number.NEGATIVE_INFINITY)
+					.right().get().alignment = Align.right;
 			}
 
 			cnt++;
