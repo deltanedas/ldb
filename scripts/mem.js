@@ -8,7 +8,7 @@ require("override-lib/library").block(MemoryBlock, {
 
 	ldbShowCell(index) {
 		return (this.ldbRangeArr.indexOf(index) != -1) ||
-			(this.ldbFilterIn === null ? false : this.ldbFilterIn(parseInt(index), this.memory[index]));
+			(this.ldbFilterIn(parseInt(index), this.memory)());
 	},
 	ldbFilterIn : null,
 
@@ -29,6 +29,9 @@ require("override-lib/library").block(MemoryBlock, {
 		setWidth(this);
 		let colMul = this.ldbColMul;
 		let minWidth = this.ldbMinWidth;
+		if (this.ldbFilterIn === null) {
+			this.ldbFilterIn = () => () => false;
+		}
 		this.ldbParseRange(this.ldbRangeStr);
 
 		table.background(Styles.black6);
@@ -57,8 +60,8 @@ require("override-lib/library").block(MemoryBlock, {
 			updatePane(this);
 		}).width(minWidth).pad(10).left()
 			.tooltip("ranges: start-end-step\n\n" +
-				"filters: JS function(index, value)\n" +
-				"only ref via arg[[]. reason unknown");
+				"filters: JS function(idx, mem[[])\n" +
+				"don't change or specify parms");
 		if (this.ldbSlideVal <= 3) { f.colspan(2); }
 		table.row();
 
@@ -112,16 +115,21 @@ require("override-lib/library").block(MemoryBlock, {
 		this.ldbRangeArr = [];
 		if (str.indexOf("function") != -1 || (str.indexOf("=>") != -1)) {
 			try {
-				eval("this.ldbFilterIn = " + str);
-				this.ldbFilterIn(NaN, NaN);
-				this.ldbFilterIn(null, null);
-				this.ldbFilterIn(undefined, undefined);
+				let code = "function() {" +
+					"const idx = arguments[0];" +
+					"const mem = arguments[1];" +
+					"return " + str + ";" +
+				"}";
+				this.ldbFilterIn = eval(code);
+				this.ldbFilterIn(NaN, [])();
+				this.ldbFilterIn(null, [])();
+				this.ldbFilterIn(undefined, [])();
 				for (var i = 0; i < 512; i++) {
-					this.ldbFilterIn(i, i);
+					this.ldbFilterIn(i, [])();
 				}
 				return;
 			} catch(e) {
-				this.ldbFilterIn = null;
+				this.ldbFilterIn = () => () => false;
 			}
 		}
 		str.split(",").forEach(e => {
