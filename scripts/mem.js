@@ -90,8 +90,7 @@ require("override-lib/library").block(MemoryBlock, {
 			table.add("[accent]#" + i).left().width(60).get().alignment = Align.left;
 
 			const index = i;
-			let lastTime1 = 0;
-			let lastTime2 = 0;
+			let lastTime1 = 0, lastTime2 = 0;
 			let lastVal = this.memory[index];
 			let lastColor = 0; /* [], [red], [green] */
 			const upVal = () => {
@@ -101,26 +100,27 @@ require("override-lib/library").block(MemoryBlock, {
 					lastTime1 = Time.time + 5;
 					lastTime2 = lastTime1 + 15;
 					return "[red]" + val;
-				} else {
-					if(lastTime1 >= Time.time) {
-						return null;
-					} else
-					if (lastTime2 >= Time.time) {
-						if (lastColor == 2) {
-							return null;
-						} else {
-							lastColor = 2;
-							return "[green]" + val;
-						}
-					} else {
-						if (lastColor == 0) {
-							return null;
-						} else {
-							lastColor = 0;
-							return val + "";
-						}
-					}
 				}
+
+				if(lastTime1 >= Time.time) {
+					return null;
+				}
+
+				if (lastTime2 >= Time.time) {
+					if (lastColor == 2) {
+						return null;
+					}
+
+					lastColor = 2;
+					return "[green]" + val;
+				}
+
+				if (lastColor == 0) {
+					return null;
+				}
+
+				lastColor = 0;
+				return val + "";
 			}
 
 			let min = Math.max(this.ldbMinWidth, this.ldbColMul * this.ldbSlideVal);
@@ -150,16 +150,15 @@ require("override-lib/library").block(MemoryBlock, {
 	},
 
 	ldbParseRange(str) {
-		const range = function(start, cnt, step) {
-			if (isNaN(step) || step === undefined || step === null) { step = 1; }
+		const range = (start, cnt, step) => {
+			if (isNaN(step) || !step) step = 1;
 			return Array.apply(0, Array(Math.floor(cnt / step))).map((_, i) => (start + i * step) + "");
 		};
+
 		this.ldbRangeArr = [];
 		if (str.indexOf("function") != -1 || (str.indexOf("=>") != -1)) {
 			try {
-				let code = "function() {" +
-					"const idx = arguments[0];" +
-					"const mem = arguments[1];" +
+				let code = "function(idx, mem) {" +
 					"return " + str + ";" +
 				"}";
 				this.ldbFilterIn = eval(code);
@@ -172,7 +171,7 @@ require("override-lib/library").block(MemoryBlock, {
 				return;
 			} catch(e) {
 				this.ldbFilterIn = () => () => false;
-				print(e);
+				Log.err(e);
 			}
 		}
 		str.split(",").forEach(e => {
@@ -182,8 +181,7 @@ require("override-lib/library").block(MemoryBlock, {
 				if (!isNaN(s)) {
 					this.ldbRangeArr.push(s + "");
 				}
-			} else
-			if (split.length >= 2) {
+			} else if (split.length >= 2) {
 				let s = parseInt(split[0]);
 				let e = parseInt(split[1]);
 				let c = parseInt(split[2]);
