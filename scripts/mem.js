@@ -14,7 +14,7 @@ require("override-lib/library").block(MemoryBlock, {
 
 	buildConfiguration(table) {
 		const updatePane = function(upSize, that) {
-			let table = pane.getWidget();
+			const table = pane.getWidget();
 			table.clearChildren();
 			table = that.ldbSetTable(table);
 			pane.setWidget(table);
@@ -33,7 +33,7 @@ require("override-lib/library").block(MemoryBlock, {
 		}
 		setWidth(this);
 		const height = 500;
-		let minWidth = this.ldbMinWidth;
+		const minWidth = this.ldbMinWidth;
 		if (this.ldbFilterIn === null) {
 			this.ldbFilterIn = () => () => false;
 		}
@@ -41,8 +41,8 @@ require("override-lib/library").block(MemoryBlock, {
 
 		table.background(Styles.black6);
 
-		let c = table.check("", v => {
-			this.ldbEditMem = v; 
+		const c = table.check("", v => {
+			this.ldbEditMem = v;
 			setWidth(this);
 			updatePane(true, this);
 		}).size(40).right().pad(10);
@@ -56,9 +56,9 @@ require("override-lib/library").block(MemoryBlock, {
 			}).left().width(minWidth - 50).get().moved(v => this.ldbSlideVal = v);
 			table.label(() => this.ldbSlideVal + "").right().pad(10).get().alignment = Align.right;
 		}).width(minWidth).pad(10).right().tooltip("columns");
-		if (this.ldbSlideVal <= 3) { table.row(); }
+		if (this.ldbSlideVal <= 3) table.row();
 
-		let f = table.field(this.ldbRangeStr, v => {
+		const f = table.field(this.ldbRangeStr, v => {
 			this.ldbRangeStr = v;
 			this.ldbParseRange(v);
 			updatePane(false, this);
@@ -66,7 +66,7 @@ require("override-lib/library").block(MemoryBlock, {
 			.tooltip("ranges: start-end-step\n\n" +
 				"filters: JS function(idx, mem[[])\n" +
 				"don't change or specify parms");
-		if (this.ldbSlideVal <= 3) { f.colspan(2); }
+		if (this.ldbSlideVal <= 3) f.colspan(2);
 		table.row();
 
 		const paneCell = table.pane(table => table.top()).height(height).pad(10).left().colspan(4);
@@ -77,11 +77,11 @@ require("override-lib/library").block(MemoryBlock, {
 	},
 
 	ldbSetTable(table) {
-		let cnt = 0;
+		let count = 0;
 		for (var i in this.memory) {
-			if (!this.ldbShowCell(i)) { continue; }
+			if (!this.ldbShowCell(i)) continue;
 
-			if (cnt % this.ldbSlideVal) {
+			if (count % this.ldbSlideVal) {
 				table.add(" [gray]|[] ");
 			} else {
 				table.row();
@@ -144,30 +144,32 @@ require("override-lib/library").block(MemoryBlock, {
 				});
 			}
 
-			cnt++;
+			count++;
 		}
 		return table;
 	},
 
 	ldbParseRange(str) {
-		const range = (start, cnt, step) => {
+		const range = (start, count, step) => {
 			if (isNaN(step) || !step) step = 1;
-			return Array.apply(0, Array(Math.floor(cnt / step))).map((_, i) => (start + i * step) + "");
+			return Array.apply(0, Array(Math.floor(count / step))).map((_, i) => (start + i * step) + "");
 		};
 
 		this.ldbRangeArr = [];
 		if (str.indexOf("function") != -1 || (str.indexOf("=>") != -1)) {
 			try {
-				let code = "function(idx, mem) {" +
+				const code = "function(idx, mem) {" +
 					"return " + str + ";" +
 				"}";
 				this.ldbFilterIn = eval(code);
 				this.ldbFilterIn(NaN, [])();
 				this.ldbFilterIn(null, [])();
 				this.ldbFilterIn(undefined, [])();
+
 				for (var i = 0; i < 512; i++) {
 					this.ldbFilterIn(i, [])();
 				}
+
 				return;
 			} catch(e) {
 				this.ldbFilterIn = () => () => false;

@@ -4,7 +4,7 @@ global.override.block(LogicBlock, {
 		// Remove long black bar due to collapser
 		table.background(null);
 
-		let editBtn = table.cells.get(0).get();
+		const editBtn = table.cells.get(0).get();
 		table.clearChildren();
 
 		table.table(null, table => {
@@ -37,10 +37,11 @@ global.override.block(LogicBlock, {
 
 	ldbBuildVariables() {
 		this.ldbCollapser = new Collapser(table => {
-			let back = new BaseDrawable(Styles.none);
+			const back = new BaseDrawable(Styles.none);
 			back.minHeight = 600;
 			table.background(back);
-			let p = table.pane(tableInPane => {
+
+			const p = table.pane(tableInPane => {
 				tableInPane.left().top().margin(10);
 				tableInPane.background(Styles.black6);
 				for (var v of this.executor.vars) {
