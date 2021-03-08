@@ -4,7 +4,7 @@ const padCf = val => {
 };
 
 global.override.block(LogicDisplay, {
-	ldbColour: Color.valueOf("#565656"),
+	ldbColor: Color.valueOf("#565656"),
 	sliders: {},
 	fields: {},
 	// locks to prevent endless loop
@@ -16,7 +16,7 @@ global.override.block(LogicDisplay, {
 			if (this.ldbSetAll) return;
 
 			if (!isNaN(val) && 0 <= val && val <= 0xFFFFFF) {
-				this.ldbColour.rgb888(val);
+				this.ldbColor.rgb888(val);
 
 				this.ldbSetAll = true;
 				if (field) {
@@ -27,17 +27,16 @@ global.override.block(LogicDisplay, {
 				this.ldbSetAll = false;
 
 				this.ldbSetChannel = true;
-				setChannel(this.ldbColour.r, "r", true, true);
-				setChannel(this.ldbColour.g, "g", true, true);
-				setChannel(this.ldbColour.b, "b", true, true);
+				setChannel(this.ldbColor.r * 255, "r", true, true);
+				setChannel(this.ldbColor.g * 255, "g", true, true);
+				setChannel(this.ldbColor.b * 255, "b", true, true);
 				this.ldbSetChannel = false;
 			}
 		};
 
 		const setChannel = (val, chan, slider, field) => {
 			if (!isNaN(val) && 0 <= val && val <= 255) {
-				val /= 255;
-				this.ldbColour[chan] = val;
+				this.ldbColor[chan] = val / 255;
 
 				this.ldbSetChannel = true;
 				if (slider) {
@@ -50,9 +49,9 @@ global.override.block(LogicDisplay, {
 
 				if (!this.ldbSetChannel) {
 					this.ldbSetAll = true;
-					const colour = this.ldbColour.rgb888();
-					cs.value = colour;
-					cf.text = padCf(colour);
+					const color = this.ldbColor.rgb888();
+					cs.value = color;
+					cf.text = padCf(color);
 					this.ldbSetAll = false;
 				}
 			}
@@ -63,33 +62,33 @@ global.override.block(LogicDisplay, {
 		global.ldbTipNo("Clear screen",
 			table.button(Icon.eraser, Styles.clearTransi, () => {
 				// add "draw clear R G B" to the display's command buffer
-				const r = this.ldbColour.a * 255,
-					g = this.ldbColour.g * 255,
-					b = this.ldbColour.b * 255;
+				const r = this.ldbColor.a * 255,
+					g = this.ldbColor.g * 255,
+					b = this.ldbColor.b * 255;
 				this.commands.addLast(DisplayCmd.get(0, r, g, b, 0, 0, 0));
 			}).size(40).pad(10)
 		);
 
-		const colour = this.ldbColour.rgb888();
-		const cs = table.slider(0, 0xFFFFFF, 1, colour, v => setAll(v, false)).padRight(10).get();
-		const cf = table.field(padCf(colour), v => setAll(parseInt(v, 16), true)).padRight(10).get();
+		const color = this.ldbColor.rgb888();
+		const cs = table.slider(0, 0xFFFFFF, 1, color, v => setAll(v, false)).padRight(10).get();
+		const cf = table.field(padCf(color), v => setAll(parseInt(v, 16), true)).padRight(10).get();
 		table.row();
 
-		const channel = (colour, chan) => {
-			const value = this.ldbColour[chan];
-			table.add(`[${colour}]${chan.toUpperCase()} `);
+		const channel = (color, chan) => {
+			const value = Math.floor(this.ldbColor[chan] * 255);
+			table.add(color + chan.toUpperCase() + " ");
 			this.sliders[chan] = table.slider(0, 0xFF, 1, value, v => setChannel(v, chan, false, true)).padRight(10).get();
-			this.fields[chan] = table.field((value * 255) + "", v => setChannel(parseInt(v), chan, true, false)).padRight(10).get();
+			this.fields[chan] = table.field(value + "", v => setChannel(parseInt(v), chan, true, false)).padRight(10).get();
 			table.row();
 		};
 
-		channel("red", "r");
-		channel("green", "g");
-		channel("blue", "b");
+		channel("[red]", "r");
+		channel("[green]", "g");
+		channel("[blue]", "b");
 
 		table.table(null, t => {
 			const img = new Image();
-			img.update(() => img.color = this.ldbColour);
+			img.update(() => img.color = this.ldbColor);
 			t.add(img).height(50).width(300);
 		}).colspan(3).pad(10);
 	}
