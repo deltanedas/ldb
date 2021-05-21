@@ -38,7 +38,7 @@ global.override.block(LogicBlock, {
 	ldbBuildVariables() {
 		this.ldbCollapser = new Collapser(table => {
 			const back = new BaseDrawable(Styles.none);
-			back.minHeight = 700;
+			back.minHeight = 1000;
 			table.background(back);
 
 			const p = table.pane(tableInPane => {
