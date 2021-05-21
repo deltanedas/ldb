@@ -62,7 +62,7 @@ global.override.block(LogicDisplay, {
 		global.ldbTipNo("Clear screen",
 			table.button(Icon.eraser, Styles.clearTransi, () => {
 				// add "draw clear R G B" to the display's command buffer
-				const r = this.ldbColor.a * 255,
+				const r = this.ldbColor.r * 255,
 					g = this.ldbColor.g * 255,
 					b = this.ldbColor.b * 255;
 				this.commands.addLast(DisplayCmd.get(0, r, g, b, 0, 0, 0));
