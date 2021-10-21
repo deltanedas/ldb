@@ -1,16 +1,16 @@
 require("override-lib/library").block(MemoryBlock, {
-	ldbSlideVal : 4,
-	ldbRangeStr : "0-511",
-	ldbRangeArr : [],
+	ldbSlideVal: 4,
+	ldbRangeStr: "0-511",
+	ldbRangeArr: [],
 	ldbEditMem: false,
-	ldbMinWidth : 0,
-	ldbColMul : 0,
+	ldbMinWidth: 0,
+	ldbColMul: 0,
 
 	ldbShowCell(index) {
 		return (this.ldbRangeArr.indexOf(index) != -1) ||
 			(this.ldbFilterIn(parseInt(index), this.memory)());
 	},
-	ldbFilterIn : null,
+	ldbFilterIn: null,
 
 	buildConfiguration(table) {
 		const updatePane = function(upSize, that) {

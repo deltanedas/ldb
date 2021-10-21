@@ -8,8 +8,8 @@ global.override.block(LogicDisplay, {
 	sliders: {},
 	fields: {},
 	// locks to prevent endless loop
-	ldbSetAll : false,
-	ldbSetChannel : false,
+	ldbSetAll: false,
+	ldbSetChannel: false,
 
 	buildConfiguration(table) {
 		const setAll = (val, field) => {
@@ -65,7 +65,8 @@ global.override.block(LogicDisplay, {
 				const r = this.ldbColor.r * 255,
 					g = this.ldbColor.g * 255,
 					b = this.ldbColor.b * 255;
-				this.commands.addLast(DisplayCmd.get(0, r, g, b, 0, 0, 0));
+				this.commands.addLast(DisplayCmd.get(LogicDisplay.commandClear,
+					r, g, b, 0, 0, 0));
 			}).size(40).pad(10)
 		);
 
