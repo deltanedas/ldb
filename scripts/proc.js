@@ -18,7 +18,7 @@ global.override.block(LogicBlock, {
 			global.ldbTipNo("restart",
 				table.button(Icon.rotate, Styles.clearTransi, () => {
 					if (this.executor.vars[0] !== undefined) {
-						this.executor.vars[0].numval = 0);
+						this.executor.vars[0].numval = 0;
 					}
 				}).size(40).center()
 			);
