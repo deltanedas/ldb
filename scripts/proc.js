@@ -38,7 +38,6 @@ global.override.block(LogicBlock, {
 	ldbBuildVariables() {
 		this.ldbCollapser = new Collapser(table => {
 			const back = new BaseDrawable(Styles.none);
-			back.minHeight = 1000;
 			table.background(back);
 
 			const p = table.pane(tableInPane => {
@@ -51,7 +50,7 @@ global.override.block(LogicBlock, {
 						tableInPane.row();
 					}
 				}
-			}).grow().left().margin(10).pad(10).get();
+			}).size(300, 600).grow().left().margin(10).pad(10).get();
 			p.setOverscroll(false, false);
 			p.setSmoothScrolling(false);
 		}, true);
