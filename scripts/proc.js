@@ -1,62 +1,39 @@
 global.override.block(LogicBlock, {
 	buildConfiguration(table) {
-		this.super$buildConfiguration(table);
-		// Remove long black bar due to collapser
-		table.background(null);
+		let opened = false; // Whether the collapser is opened
+		const buttons = table.table().get(); // Put all buttons in a nested table to fix spacing
+		this.super$buildConfiguration(buttons); // Pass the button table
 
-		const editBtn = table.cells.get(0).get();
-		table.clearChildren();
+		const collapserButton = buttons.button(Icon.downOpen, Styles.clearTransi, () => {
+			opened = !opened;
+			collapserButton.style.imageUp = opened ? Icon.upOpen : Icon.downOpen;
+		}).size(40).tooltip("vars").get();
 
-		table.table(null, table => {
-			table.add(editBtn).size(40);
-
-			const button = table.button(Icon.downOpen, Styles.clearTransi, () => {
-				this.ldbCollapser.toggle();
-				button.style.imageUp = this.ldbCollapser.collapsed ? Icon.downOpen : Icon.upOpen;
-			}).size(40).center().tooltip("vars").get();
-
-			global.ldbTipNo("restart",
-				table.button(Icon.rotate, Styles.clearTransi, () => {
-					if (this.executor.vars[0] !== undefined) {
-						this.executor.vars[0].numval = 0;
-					}
-				}).size(40).center()
-			);
-
-			global.ldbTipNo("reset",
-				table.button(Icon.trash, Styles.clearTransi, () => {
-					this.updateCode(this.code);
-					let collapsed = this.ldbCollapser.isCollapsed();
-					this.ldbBuildVariables();
-					cell.setElement(this.ldbCollapser).get().setCollapsed(collapsed);
-				}).size(40).center()
-			);
-		}).center();
-		table.row();
-
-		this.ldbBuildVariables();
-		const cell = table.add(this.ldbCollapser).size(300, 600).bottom();
-	},
-
-	ldbBuildVariables() {
-		this.ldbCollapser = new Collapser(table => {
-			const back = new BaseDrawable(Styles.none);
-			table.background(back);
-
-			const p = table.pane(tableInPane => {
-				tableInPane.left().top().margin(10);
-				tableInPane.background(Styles.black6);
-				for (var v of this.executor.vars) {
-					// Only show the constant @unit
-					if (!v.constant || v.name == "@unit") {
-						tableInPane.label(this.ldbVarVal(v)).padLeft(10).left().get().alignment = Align.left;
-						tableInPane.row();
-					}
+		global.ldbTipNo("restart",
+			buttons.button(Icon.rotate, Styles.clearTransi, () => {
+				if (this.executor.vars[0] !== undefined) {
+					this.executor.vars[0].numval = 0;
 				}
-			}).size(300, 600).grow().left().margin(10).pad(10).get();
-			p.setOverscroll(false, false);
-			p.setSmoothScrolling(false);
-		}, true);
+			}).size(40)
+		);
+
+		global.ldbTipNo("reset",
+		buttons.button(Icon.trash, Styles.clearTransi, () => {
+				this.updateCode(this.code);
+			}).size(40)
+		);
+
+		table.row();
+		table.collapser(c => {
+			c.background(Styles.black6).left().margin(10);
+			for (let v of this.executor.vars) {
+				// Only show the constant @unit
+				if (!v.constant || v.name == "@unit") {
+					c.label(this.ldbVarVal(v)).labelAlign(Align.left).fillX();
+					c.row();
+				}
+			}
+		}, false, () => opened).top().left().width(300).touchable(() => Touchable.disabled).self(c => c.height(c.get().getChildren().first().getPrefHeight())) // Match inner table's target height, prevent blocking clicks
 	},
 
 	ldbVarVal: v => () => {
@@ -69,6 +46,4 @@ global.override.block(LogicBlock, {
 
 		return v.name + ": " + v.numval;
 	},
-
-	ldbCollapser: null
 });
